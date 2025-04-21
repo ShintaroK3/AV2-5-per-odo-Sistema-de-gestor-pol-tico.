@@ -1,3 +1,8 @@
 from django.contrib import admin
+from .models import Promotion
+from .models.tag import Tag
+from .models.category import Category
 
-# Register your models here.
+admin.site.register(Promotion)
+admin.site.register(Tag)
+admin.site.register(Category)

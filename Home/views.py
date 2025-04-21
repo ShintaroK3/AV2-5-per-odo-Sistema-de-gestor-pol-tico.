@@ -1,4 +1,9 @@
 from django.shortcuts import render
+from promotions.models.promotion import Promotion
 
 def home(request):
-    return render(request, 'home.html')
+    promotions = Promotion.objects.all()
+    context = {
+        'promotions': promotions
+    }
+    return render(request, 'home.html', context)
