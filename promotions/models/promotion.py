@@ -13,6 +13,7 @@ class Promotion(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT)
     tags = models.ManyToManyField(Tag)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    imagem = models.ImageField(upload_to='promocoes/', blank=True, null=True)
 
     def __str__(self):
         return self.title

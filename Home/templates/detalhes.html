@@ -6,8 +6,11 @@
 <div class="container mt-4">
     <h1>{{ promotion.title }}</h1>
     <h4 class="text-muted">{{ promotion.Category }}</h4>
-    <p class="lead">{{ promotion.subtitle }}</p>
-    <h5 class="text-primary">Preço: {{ promotion.price }} R$</h5>
+    <p class="lead">{{ promotion.ssubtitle }}</p>
+    {% if promotion.imagem %}
+    <img src="{{ promotion.imagem.url }}" alt="Imagem" class="img-fluid mx-auto d-block" style="max-width: 500px; height: auto;">
+    {% endif %}
+    <h5 class="text-primary">Valor doado: {{ promotion.price }} R$</h5>
     
     <div>
         {% for tag in promotion.tags.all %}
