@@ -19,12 +19,15 @@ from django.urls import path
 from Home import views
 from django.conf import settings
 from django.conf.urls.static import static
-
+from Login import views as login_views 
+from Home import views as home_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('home/', views.home, name='home'), 
-    path ('detalhes/<int:promo_id>/', views.detalhe_view, name= 'detalhes'),
+    path('home/', home_views.home, name='home'), 
+    path('detalhes/<int:promo_id>/', views.detalhe_view, name= 'detalhes'),
+    path('login/', login_views.login_view, name='login'),
+    path('register/', login_views.register_view, name='register'),
 
 ]
 

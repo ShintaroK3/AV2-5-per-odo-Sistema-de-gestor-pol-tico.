@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'Home',
     'promotions',
     'widget_tweaks',
+    'Login',
 ]
 
 MIDDLEWARE = [
@@ -135,8 +136,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/'  # ou onde quiser redirecionar após login
-LOGOUT_REDIRECT_URL = '/login/'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = 'home/'
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
