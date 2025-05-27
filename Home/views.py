@@ -1,10 +1,17 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect
 from promotions.models.promotion import Promotion
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required 
+from django.views.generic import DetailView, ListView, CreateView, DeleteView 
+from django.contrib.messages.views import SuccessMessageMixin 
+from django.urls import reverse_lazy 
 
 
+
+@login_required 
 def home(request):
     promotions = Promotion.objects.all()
     context = {
@@ -12,34 +19,59 @@ def home(request):
     }
     return render(request, 'home.html', context)
 
-def detalhe_view(request, promo_id):
-    promotion = get_object_or_404(Promotion, id=promo_id)
-    return render(request, 'detalhes.html', {'promotion': promotion})
 
+class PromotionDetailView(LoginRequiredMixin, DetailView): 
+    model = Promotion
+    template_name = 'detalhes.html'
+    context_object_name = 'promotion'
+    
+
+
+@login_required 
+@permission_required('auth.view_user', raise_exception=True) 
 def gerenciar(request):
     return render(request, 'gerenciar.html')
 
-def cadastrar_usuario(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Usuário já existe!')
-        else:
-            User.objects.create_user(username=username, password=password)
-            messages.success(request, 'Usuário cadastrado com sucesso!')
-            return redirect(reverse('home'))
 
-    return render(request, 'cadastrouser.html')
+class RegisterUserView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
+    model = User
+    fields = ['username', 'password']
+    template_name = 'cadastrouser.html'
+    success_url = reverse_lazy('home')
+    success_message = 'Usuário cadastrado com sucesso!'
+    permission_required = 'auth.add_user'
 
-def gerenciar_usuarios(request):
-    users = User.objects.all()
-    return render(request, 'gerenciarusers.html', {'users': users})
+    def form_valid(self, form):
+        
+        user = form.save(commit=False)
+        user.set_password(form.cleaned_data['password'])
+        user.save()
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.method == 'POST' and not self.request.POST.get('username'):
+            messages.error(self.request, 'O campo de usuário não pode ser vazio.')
+        return context
 
-def deletar_usuario(request, user_id):
-    user = get_object_or_404(User, id=user_id)
-    user.delete()
-    return redirect(reverse('home'))  
 
 
+class GerenciarUsersView(LoginRequiredMixin, PermissionRequiredMixin, ListView): 
+    model = User
+    template_name = 'gerenciarusers.html'
+    context_object_name = 'users'
+    permission_required = 'auth.view_user' 
 
+
+class DeleteUserView(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, DeleteView):
+    model = User
+    template_name = 'confirm_delete.html' 
+    success_url = reverse_lazy('gerenciar_usuarios')
+    success_message = "Usuário deletado com sucesso!"
+    permission_required = 'auth.delete_user' 
+
+    def form_valid(self, form):
+        if self.request.user.id == self.get_object().id:
+            messages.error(self.request, "Você não pode deletar sua própria conta!")
+            return redirect(self.success_url)
+        return super().form_valid(form)

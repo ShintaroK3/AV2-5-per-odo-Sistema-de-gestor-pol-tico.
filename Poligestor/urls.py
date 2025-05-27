@@ -1,23 +1,26 @@
-
 from django.contrib import admin
-from django.urls import path
-from Home import views
+from django.urls import path, reverse_lazy
 from django.conf import settings
 from django.conf.urls.static import static
-from Login import views as login_views 
+from django.contrib.auth.views import LogoutView 
+
 from Home import views as home_views
+from Home.views import PromotionDetailView, GerenciarUsersView, RegisterUserView, DeleteUserView 
+from Login import views as login_views
+from Login.views import UserLoginView, UserRegisterView, custom_logout_view 
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', home_views.home, name='home'), 
-    path('detalhes/<int:promo_id>/', views.detalhe_view, name= 'detalhes'),
-    path('', login_views.login_view, name='login'),
-    path('register/', login_views.register_view, name='register'),
-    path('deletar-usuario/<int:user_id>/', views.deletar_usuario, name='deletar_usuario'),
-    path('gerenciar/', views.gerenciar, name='gerenciar'),
-    path('cadastrar-usuario/', views.cadastrar_usuario, name='cadastrar_usuario'),
-    path('gerenciar-usuarios/', views.gerenciar_usuarios, name='gerenciar_usuarios'),
-
+    path('detalhes/<int:pk>/', PromotionDetailView.as_view(), name='detalhes'), 
+    path('', UserLoginView.as_view(), name='login'), 
+    path('register/', UserRegisterView.as_view(), name='register'), 
+    path('logout/', custom_logout_view, name='logout'), 
+    path('gerenciar/', home_views.gerenciar, name='gerenciar'), 
+    path('cadastrar-usuario/', RegisterUserView.as_view(), name='cadastrar_usuario'), 
+    path('gerenciar-usuarios/', GerenciarUsersView.as_view(), name='gerenciar_usuarios'), 
+    path('deletar-usuario/<int:pk>/', DeleteUserView.as_view(), name='deletar_usuario'), 
 
 ]
 
